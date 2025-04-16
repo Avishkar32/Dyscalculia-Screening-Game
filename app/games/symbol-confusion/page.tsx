@@ -198,11 +198,11 @@ export default function SymbolConfusionGame() {
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  onClick={() => router.push("/")}
+                  onClick={() => router.push("/games/pattern-recognition")}
                   size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500 text-xl px-8 py-6 h-auto rounded-2xl shadow-md"
                 >
-                  More Games 🎮
+                  Next Game: Pattern Recognition 🎮
                 </Button>
               </motion.div>
             </div>
