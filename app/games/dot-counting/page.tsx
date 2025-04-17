@@ -18,7 +18,9 @@ export default function DotCountingGame() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [answerTimes, setAnswerTimes] = useState<number[]>([])
 
+  
   // Sound effects
   const correctSound = new Howl({
     src: ["/sounds/correct.mp3"],
@@ -112,6 +114,10 @@ export default function DotCountingGame() {
       incorrectSound.play()
     }
 
+    // Record answer time
+    const answerTime = new Date().getTime()
+    setAnswerTimes([...answerTimes, answerTime])
+
     // Move to next question after delay
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
@@ -132,7 +138,29 @@ export default function DotCountingGame() {
     setIsCorrect(null)
     setGameState("intro")
     setShowConfetti(false)
+    setAnswerTimes([])
   }
+
+  useEffect(() => {
+    if (gameState === "result") {
+      // Save results to session storage (replace or add this game's result)
+      const averageTime = 0 // If you have timing, compute it; else keep as 0
+      const existingResults = JSON.parse(sessionStorage.getItem("gameResults") || "[]")
+      const filtered = existingResults.filter((g: any) => g.gameId !== "dot-counting")
+      const gameResults = [
+        ...filtered,
+        {
+          gameId: "dot-counting",
+          gameName: "Dot Counting Game",
+          score,
+          totalQuestions: questions.length,
+          averageTime,
+          completed: true,
+        },
+      ]
+      sessionStorage.setItem("gameResults", JSON.stringify(gameResults))
+    }
+  }, [gameState, score])
 
   useEffect(() => {
     if (gameState === "result" && score === questions.length) {

@@ -8,6 +8,8 @@ import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
 import { Timer } from "@/components/timer"
 
+import useScoreStore from "@/app/store/scoreStore";
+
 export default function PatternCompletionGame() {
   const router = useRouter()
   const [gameState, setGameState] = useState<"intro" | "playing" | "result">("intro")
@@ -20,6 +22,7 @@ export default function PatternCompletionGame() {
   const [questionStartTime, setQuestionStartTime] = useState(0)
   const [answerTimes, setAnswerTimes] = useState<number[]>([])
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const addScore = useScoreStore((state) => state.addScore);
 
   const questions = [
     {
@@ -95,25 +98,95 @@ export default function PatternCompletionGame() {
     }
   }
 
+  // const handleAnswer = (answer: string) => {
+  //   if (selectedAnswer !== null) return // Prevent multiple answers
+
+  //   // Stop timer and calculate time taken
+  //   stopTimer()
+  //   const timeTaken = (Date.now() - questionStartTime) / 1000
+  //   setAnswerTimes((prev) => [...prev, timeTaken])
+
+  //   setSelectedAnswer(answer)
+  //   const correct = answer === questions[currentQuestion].correctAnswer
+  //   setIsCorrect(correct)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (currentQuestion === questions.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question after delay
+  //   setTimeout(() => {
+  //     if (currentQuestion < questions.length - 1) {
+  //       setCurrentQuestion(currentQuestion + 1)
+  //       setSelectedAnswer(null)
+  //       setIsCorrect(null)
+  //       setQuestionStartTime(Date.now())
+  //       startTimer()
+  //     } else {
+  //       setGameState("result")
+
+  //       // Save results if in assessment mode
+  //       const isAssessment = window.location.pathname.includes("/assessment/")
+  //       if (isAssessment) {
+  //         const averageTime = answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length
+
+  //         // Get existing results or initialize
+  //         const existingResults = JSON.parse(sessionStorage.getItem("gameResults") || "[]")
+
+  //         // Add this game's results
+  //         const gameResults = [
+  //           ...existingResults,
+  //           {
+  //             gameId: "pattern-completion",
+  //             gameName: "Pattern Completion Game",
+  //             score,
+  //             totalQuestions: questions.length,
+  //             averageTime,
+  //             completed: true,
+  //           },
+  //         ]
+
+  //         // Save to session storage
+  //         sessionStorage.setItem("gameResults", JSON.stringify(gameResults))
+
+  //         // Redirect to next game or results page after delay
+  //         setTimeout(() => {
+  //           const userAge = Number.parseInt(sessionStorage.getItem("userAge") || "0")
+
+  //           if (userAge >= 9) {
+  //             router.push("/assessment/place-value")
+  //           } else {
+  //             router.push("/assessment/word-problem")
+  //           }
+  //         }, 3000)
+  //       }
+  //     }
+  //   }, 3000)
+  // }
+
   const handleAnswer = (answer: string) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
-
+  
     // Stop timer and calculate time taken
     stopTimer()
     const timeTaken = (Date.now() - questionStartTime) / 1000
     setAnswerTimes((prev) => [...prev, timeTaken])
-
+  
     setSelectedAnswer(answer)
     const correct = answer === questions[currentQuestion].correctAnswer
     setIsCorrect(correct)
-
+  
+    const newScore = correct ? score + 1 : score
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
     }
-
+  
     // Move to next question after delay
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
@@ -123,46 +196,44 @@ export default function PatternCompletionGame() {
         setQuestionStartTime(Date.now())
         startTimer()
       } else {
+        setScore(newScore) // ✅ ensure final score is updated
+  
         setGameState("result")
-
+  
         // Save results if in assessment mode
-        const isAssessment = window.location.pathname.includes("/assessment/")
-        if (isAssessment) {
-          const averageTime = answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length
+        
+          const allTimes = [...answerTimes, timeTaken]
+          const averageTime = allTimes.reduce((sum, time) => sum + time, 0) / allTimes.length
+  
+          // ✅ Just log the result instead of saving to sessionStorage
+          console.log({
+            gameName: "Pattern Completion Game",
+            score: newScore,
+            averageTime,
+          })
 
-          // Get existing results or initialize
-          const existingResults = JSON.parse(sessionStorage.getItem("gameResults") || "[]")
-
-          // Add this game's results
-          const gameResults = [
-            ...existingResults,
-            {
-              gameId: "pattern-completion",
-              gameName: "Pattern Completion Game",
-              score,
-              totalQuestions: questions.length,
-              averageTime,
-              completed: true,
-            },
-          ]
-
-          // Save to session storage
-          sessionStorage.setItem("gameResults", JSON.stringify(gameResults))
-
+       
+          addScore('pattern-completion', {
+            score: newScore,
+            averageTime// Only include if exists
+          });
+          
           // Redirect to next game or results page after delay
           setTimeout(() => {
             const userAge = Number.parseInt(sessionStorage.getItem("userAge") || "0")
-
+  
             if (userAge >= 9) {
-              router.push("/assessment/place-value")
+              router.push("/games/place-value")
             } else {
-              router.push("/assessment/word-problem")
+              router.push("/games/word-problem")
             }
           }, 3000)
-        }
+        
       }
     }, 3000)
   }
+  
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)

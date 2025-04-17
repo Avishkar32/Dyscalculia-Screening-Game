@@ -7,6 +7,7 @@ import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
 import { Volume2 } from "lucide-react"
+import useScoreStore from "@/app/store/scoreStore"
 
 export default function WordProblemGame() {
   const router = useRouter()
@@ -16,6 +17,7 @@ export default function WordProblemGame() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const addScore = useScoreStore((state) => state.addScore)
 
   const questions = [
     {
@@ -54,20 +56,47 @@ export default function WordProblemGame() {
     setGameState("playing")
   }
 
+  // const handleAnswer = (answer: string) => {
+  //   if (selectedAnswer !== null) return // Prevent multiple answers
+
+  //   setSelectedAnswer(answer)
+  //   const correct = answer === questions[currentQuestion].correctAnswer
+  //   setIsCorrect(correct)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (currentQuestion === questions.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question after delay
+  //   setTimeout(() => {
+  //     if (currentQuestion < questions.length - 1) {
+  //       setCurrentQuestion(currentQuestion + 1)
+  //       setSelectedAnswer(null)
+  //       setIsCorrect(null)
+  //     } else {
+  //       setGameState("result")
+  //     }
+  //   }, 1500)
+  // }
+
   const handleAnswer = (answer: string) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
-
+  
     setSelectedAnswer(answer)
     const correct = answer === questions[currentQuestion].correctAnswer
     setIsCorrect(correct)
-
+  
+    const newScore = correct ? score + 1 : score
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
     }
-
+  
     // Move to next question after delay
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
@@ -75,10 +104,22 @@ export default function WordProblemGame() {
         setSelectedAnswer(null)
         setIsCorrect(null)
       } else {
+        setScore(newScore) // Ensure the final score is set
         setGameState("result")
+  
+        // ✅ Log final result
+        console.log({
+          score: newScore,
+          totalQuestions: questions.length,
+        })
+
+        addScore('word-problem', {
+          score: newScore,
+        });
       }
     }, 1500)
   }
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)

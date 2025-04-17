@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
+import useScoreStore from "@/app/store/scoreStore"
 
 export default function NumberComparisonGame() {
   const router = useRouter()
@@ -15,6 +16,8 @@ export default function NumberComparisonGame() {
   const [selectedSide, setSelectedSide] = useState<"left" | "right" | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const addScore = useScoreStore((state) => state.addScore);
+  const timeData = undefined;
 
   const questions = [
     {
@@ -58,21 +61,54 @@ export default function NumberComparisonGame() {
     setGameState("playing")
   }
 
+  // const handleAnswer = (side: "left" | "right" | "equal") => {
+  //   if (selectedSide !== null) return // Prevent multiple answers
+
+  //   setSelectedSide(side)
+  //   const correct = side === questions[currentQuestion].correctAnswer
+  //   setIsCorrect(correct)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (currentQuestion === questions.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question after delay
+  //   setTimeout(() => {
+  //     if (currentQuestion < questions.length - 1) {
+  //       setCurrentQuestion(currentQuestion + 1)
+  //       setSelectedSide(null)
+  //       setIsCorrect(null)
+  //     } else {
+  //       setGameState("result")
+
+  //       addScore("number-comparison", score ) 
+  //       console.log(score);
+
+  //       console.log(addScore);
+
+  //     }
+  //   }, 1200)
+  // }
+
   const handleAnswer = (side: "left" | "right" | "equal") => {
     if (selectedSide !== null) return // Prevent multiple answers
-
+  
     setSelectedSide(side)
     const correct = side === questions[currentQuestion].correctAnswer
     setIsCorrect(correct)
-
+  
+    const newScore = correct ? score + 1 : score
+  
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
     }
-
-    // Move to next question after delay
+  
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1)
@@ -80,9 +116,19 @@ export default function NumberComparisonGame() {
         setIsCorrect(null)
       } else {
         setGameState("result")
+        addScore("number-comparison", // ✅ fixed score used here
+
+        {
+          score: newScore,
+          ...(timeData !== undefined && { averageTime: timeData }) // Only include if exists
+        } )
+
+        console.log(newScore)
+        console.log(addScore)
       }
-    }, 1500)
+    }, 1200)
   }
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)

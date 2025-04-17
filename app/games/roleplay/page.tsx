@@ -9,6 +9,7 @@ import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
 import { Input } from "@/components/ui/input"
+import useScoreStore from "@/app/store/scoreStore"
 
 export default function MathRoleplayGame() {
   const router = useRouter()
@@ -19,6 +20,7 @@ export default function MathRoleplayGame() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const [isAnswered, setIsAnswered] = useState(false)
+  const addScore = useScoreStore((state) => state.addScore)
 
   const scenarios = [
     {
@@ -66,21 +68,51 @@ export default function MathRoleplayGame() {
     setGameState("playing")
   }
 
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   if (!userAnswer.trim() || isAnswered) return
+
+  //   const correct = userAnswer.trim() === scenarios[currentQuestion].correctAnswer
+  //   setIsCorrect(correct)
+  //   setIsAnswered(true)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (currentQuestion === scenarios.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question after delay
+  //   setTimeout(() => {
+  //     if (currentQuestion < scenarios.length - 1) {
+  //       setCurrentQuestion(currentQuestion + 1)
+  //       setUserAnswer("")
+  //       setIsCorrect(null)
+  //       setIsAnswered(false)
+  //     } else {
+  //       setGameState("result")
+  //     }
+  //   }, 2000)
+  // }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!userAnswer.trim() || isAnswered) return
-
+  
     const correct = userAnswer.trim() === scenarios[currentQuestion].correctAnswer
     setIsCorrect(correct)
     setIsAnswered(true)
-
+  
+    const newScore = correct ? score + 1 : score
+  
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === scenarios.length - 1) {
         setShowConfetti(true)
       }
     }
-
+  
     // Move to next question after delay
     setTimeout(() => {
       if (currentQuestion < scenarios.length - 1) {
@@ -89,10 +121,21 @@ export default function MathRoleplayGame() {
         setIsCorrect(null)
         setIsAnswered(false)
       } else {
+        setScore(newScore)
         setGameState("result")
+  
+        // ✅ Log final results
+        console.log({
+          score: newScore,
+          totalQuestions: scenarios.length,
+        })
+        addScore('roleplay word problems', {
+          score: newScore,
+        });
       }
     }, 2000)
   }
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)

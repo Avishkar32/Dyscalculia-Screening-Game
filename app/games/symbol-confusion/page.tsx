@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
+import useScoreStore from "@/app/store/scoreStore";
+
 
 export default function SymbolConfusionGame() {
   const router = useRouter()
@@ -15,6 +17,7 @@ export default function SymbolConfusionGame() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+ const addScore = useScoreStore((state) => state.addScore);
 
   const questions = [
     {
@@ -48,20 +51,47 @@ export default function SymbolConfusionGame() {
     setGameState("playing")
   }
 
+  // const handleAnswer = (answer: string) => {
+  //   if (selectedAnswer !== null) return // Prevent multiple answers
+
+  //   setSelectedAnswer(answer)
+  //   const correct = answer === questions[currentQuestion].correctAnswer
+  //   setIsCorrect(correct)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (currentQuestion === questions.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question after delay
+  //   setTimeout(() => {
+  //     if (currentQuestion < questions.length - 1) {
+  //       setCurrentQuestion(currentQuestion + 1)
+  //       setSelectedAnswer(null)
+  //       setIsCorrect(null)
+  //     } else {
+  //       setGameState("result")
+  //     }
+  //   }, 1500)
+  // }
   const handleAnswer = (answer: string) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
-
+  
     setSelectedAnswer(answer)
     const correct = answer === questions[currentQuestion].correctAnswer
     setIsCorrect(correct)
-
+  
+    const newScore = correct ? score + 1 : score
+  
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
     }
-
+  
     // Move to next question after delay
     setTimeout(() => {
       if (currentQuestion < questions.length - 1) {
@@ -69,10 +99,15 @@ export default function SymbolConfusionGame() {
         setSelectedAnswer(null)
         setIsCorrect(null)
       } else {
+        setScore(newScore) // ✅ ensure score is set correctly even if last question is wrong
         setGameState("result")
+        addScore("symbol-confusion",
+          {score:newScore} ) // ✅ fixed score used here
+        console.log("Score added to store:", newScore)
       }
     }, 1500)
   }
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)
@@ -198,7 +233,7 @@ export default function SymbolConfusionGame() {
               </motion.div>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
-                  onClick={() => router.push("/games/pattern-recognition")}
+                  onClick={() => router.push("/games/pattern-completion")}
                   size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-orange-400 hover:from-pink-600 hover:to-orange-500 text-xl px-8 py-6 h-auto rounded-2xl shadow-md"
                 >

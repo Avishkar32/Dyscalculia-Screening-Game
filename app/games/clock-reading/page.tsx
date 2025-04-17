@@ -7,6 +7,7 @@ import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
 import { Timer } from "@/components/timer"
+import useScoreStore from "@/app/store/scoreStore"
 
 export default function ClockReadingGame() {
   const router = useRouter()
@@ -22,6 +23,7 @@ export default function ClockReadingGame() {
   const [isBonusQuestion, setIsBonusQuestion] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const addScore = useScoreStore((state) => state.addScore)
 
   const questions = [
     {
@@ -170,28 +172,70 @@ export default function ClockReadingGame() {
     ctx.stroke()
   }
 
+  // const handleAnswer = (answer: string) => {
+  //   if (selectedAnswer !== null) return // Prevent multiple answers
+
+  //   // Stop timer and calculate time taken
+  //   stopTimer()
+  //   const timeTaken = (Date.now() - questionStartTime) / 1000
+  //   setAnswerTimes((prev) => [...prev, timeTaken])
+
+  //   setSelectedAnswer(answer)
+
+  //   const currentQ = isBonusQuestion ? questions[currentQuestion].bonusAnswer : questions[currentQuestion].correctAnswer
+
+  //   const correct = answer === currentQ
+  //   setIsCorrect(correct)
+
+  //   if (correct) {
+  //     setScore(score + 1)
+  //     if (!isBonusQuestion && currentQuestion === questions.length - 1) {
+  //       setShowConfetti(true)
+  //     }
+  //   }
+
+  //   // Move to next question or bonus question after delay
+  //   setTimeout(() => {
+  //     if (isBonusQuestion) {
+  //       if (currentQuestion < questions.length - 1) {
+  //         setCurrentQuestion(currentQuestion + 1)
+  //         setIsBonusQuestion(false)
+  //       } else {
+  //         setGameState("result")
+  //       }
+  //     } else {
+  //       // Show bonus question for this clock
+  //       setIsBonusQuestion(true)
+  //     }
+
+  //     setSelectedAnswer(null)
+  //     setIsCorrect(null)
+  //     setQuestionStartTime(Date.now())
+  //     startTimer()
+  //   }, 2000)
+  // }
   const handleAnswer = (answer: string) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
-
+  
     // Stop timer and calculate time taken
     stopTimer()
     const timeTaken = (Date.now() - questionStartTime) / 1000
     setAnswerTimes((prev) => [...prev, timeTaken])
-
+  
     setSelectedAnswer(answer)
-
+  
     const currentQ = isBonusQuestion ? questions[currentQuestion].bonusAnswer : questions[currentQuestion].correctAnswer
-
+  
     const correct = answer === currentQ
     setIsCorrect(correct)
-
+  
     if (correct) {
       setScore(score + 1)
       if (!isBonusQuestion && currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
     }
-
+  
     // Move to next question or bonus question after delay
     setTimeout(() => {
       if (isBonusQuestion) {
@@ -200,18 +244,26 @@ export default function ClockReadingGame() {
           setIsBonusQuestion(false)
         } else {
           setGameState("result")
+          console.log("Final Score:", score + (correct ? 1 : 0)) // ✅ log the final score
+          console.log("Answer Times (seconds):", [...answerTimes, timeTaken]) // ✅ log times
+         
+          addScore("clock-reading", {
+            score: score + (correct ? 1 : 0),
+            //averageTime: (answerTimes.reduce((sum, time) => sum + time, 0) + timeTaken) / (answerTimes.length + 1),
+          })
         }
       } else {
         // Show bonus question for this clock
         setIsBonusQuestion(true)
       }
-
+  
       setSelectedAnswer(null)
       setIsCorrect(null)
       setQuestionStartTime(Date.now())
       startTimer()
     }, 2000)
   }
+  
 
   const restartGame = () => {
     setCurrentQuestion(0)
