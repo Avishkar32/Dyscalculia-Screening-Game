@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
+import CandylandBackground from "@/app/CandylandBackground/page"
 
 export default function ObjectCountingGame() {
   const router = useRouter()
@@ -107,6 +108,7 @@ export default function ObjectCountingGame() {
   }
 
   return (
+    <CandylandBackground>
     <GameLayout
       title="Object Counting Fun"
       icon="🧸"
@@ -244,5 +246,6 @@ export default function ObjectCountingGame() {
         </motion.div>
       )}
     </GameLayout>
+    </CandylandBackground>
   )
 }

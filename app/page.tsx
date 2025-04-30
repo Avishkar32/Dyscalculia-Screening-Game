@@ -74,11 +74,10 @@ export default function Home() {
   ]
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-100 py-8">
       <div className="container mx-auto px-4">
         <div className="mb-10 text-center">
           <div className="relative inline-block">
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-2">
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 mb-2 pt-12">
               Math Adventure
             </h1>
             <Sparkles className="absolute -top-4 -right-8 text-yellow-400 animate-pulse" size={24} />
@@ -108,7 +107,7 @@ export default function Home() {
             <Link href={`/games/${game.id}`} key={game.id} className="transform transition-all hover:scale-105">
               <Card className="border-4 border-indigo-200 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl hover:border-indigo-300 h-full">
                 <div className="absolute -right-6 -top-6 bg-gradient-to-br from-pink-400 to-purple-500 w-20 h-20 rounded-full flex items-end justify-start p-2">
-                  <span className="text-4xl">{game.emoji}</span>
+                  <span className="text-4xl px-2 py-3">{game.emoji}</span>
                 </div>
                 <CardHeader className="bg-gradient-to-r from-indigo-100 to-purple-100 pt-8 pb-4">
                   <div className="flex items-center">
@@ -130,6 +129,5 @@ export default function Home() {
           ))}
         </div>
       </div>
-    </main>
   )
 }

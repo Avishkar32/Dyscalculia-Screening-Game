@@ -17,6 +17,7 @@ export default function MultiStepWordProblemGame() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const [showSteps, setShowSteps] = useState(false)
+  
 
   const questions = [
     {

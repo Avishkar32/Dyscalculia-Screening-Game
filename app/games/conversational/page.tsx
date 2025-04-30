@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import Confetti from "@/components/confetti"
 import { Send } from "lucide-react"
 import { Timer } from "@/components/timer"
+import useScoreStore from "@/app/store/scoreStore"
 
 interface Message {
   text: string
@@ -34,6 +35,7 @@ export default function ConversationalMathGame() {
   const [timeElapsed, setTimeElapsed] = useState(0)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const addScore = useScoreStore((state) => state.addScore)
 
   const scenarios = [
     {
@@ -227,6 +229,14 @@ export default function ConversationalMathGame() {
             if (score >= 4) {
               setShowConfetti(true)
             }
+
+           
+            addScore("conversation", // ✅ fixed score used here
+
+              {
+                score: score,
+                ...({ averageTime:  answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length }) // Only include if exists
+              } )
           }
         } else {
           // Ask next question in current scenario

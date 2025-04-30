@@ -23,7 +23,7 @@ export default function GameLayout({ title, icon, ageGroup, progress, children }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-purple-100 py-6">
+    <div className="min-h-screen py-6">
       <div className="container mx-auto px-4 max-w-4xl">
         <header className="mb-6">
           <div className="flex justify-between items-center mb-4">
@@ -70,12 +70,12 @@ export default function GameLayout({ title, icon, ageGroup, progress, children }
           <p className="text-center text-indigo-600 mb-4">Age Group: {ageGroup}</p>
           <Progress
             value={progress}
-            className="h-3 bg-indigo-100"
-            indicatorClassName="bg-gradient-to-r from-indigo-500 to-purple-500"
+            className="h-3 bg-indigo-100 mt-12"
+            indicatorClassName="bg-gradient-to-r from-indigo-500 to-purple-500 "
           />
         </header>
 
-        <main className="bg-white rounded-3xl shadow-xl p-6 mb-8 border-4 border-indigo-100">{children}</main>
+        <main className="bg-white rounded-3xl shadow-xl p-6 mb-8 border-4 border-indigo-100 mt-12">{children}</main>
       </div>
     </div>
   )

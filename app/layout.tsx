@@ -1,6 +1,7 @@
 import type React from "react"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
+import CandylandBackground from "./CandylandBackground/page"
 
 export const metadata = {
   title: "Math Adventure - Dyscalculia Screening",
@@ -22,12 +23,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
-          {children}
+          <CandylandBackground>
+            {children}
+          </CandylandBackground>
         </ThemeProvider>
       </body>
     </html>
   )
 }
-
-
-import './globals.css'
