@@ -145,7 +145,8 @@ export default function PatternCompletionGame() {
        
           addScore('pattern-completion', {
             score: newScore,
-            averageTime// Only include if exists
+            averageTime,// Only include if exists
+            totalQuestions: questions.length,
           });
           
           // Redirect to next game or results page after delay

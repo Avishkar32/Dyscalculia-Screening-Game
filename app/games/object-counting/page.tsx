@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import GameLayout from "@/components/game-layout"
 import { motion } from "framer-motion"
 import Confetti from "@/components/confetti"
 import CandylandBackground from "@/app/CandylandBackground/page"
+import useScoreStore from "@/app/store/scoreStore";
 
 export default function ObjectCountingGame() {
   const router = useRouter()
@@ -16,6 +17,11 @@ export default function ObjectCountingGame() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [timeElapsed, setTimeElapsed] = useState(0)
+  const [questionStartTime, setQuestionStartTime] = useState(0)
+  const [answerTimes, setAnswerTimes] = useState<number[]>([])
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const addScore = useScoreStore((state) => state.addScore);
 
   const questions = [
     {
@@ -52,17 +58,41 @@ export default function ObjectCountingGame() {
 
   const startGame = () => {
     setGameState("playing")
+    setQuestionStartTime(Date.now())
+    startTimer()
+  }
+
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    setTimeElapsed(0)
+
+    timerRef.current = setInterval(() => {
+      setTimeElapsed((prev) => prev + 1)
+    }, 1000)
+  }
+
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+      timerRef.current = null
+    }
   }
 
   const handleAnswer = (answer: number) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
 
+    // Stop timer and calculate time taken
+    stopTimer()
+    const timeTaken = (Date.now() - questionStartTime) / 1000
+    setAnswerTimes((prev) => [...prev, timeTaken])
+
     setSelectedAnswer(answer)
     const correct = answer === questions[currentQuestion].count
     setIsCorrect(correct)
 
+    const newScore = correct ? score + 1 : score
     if (correct) {
-      setScore(score + 1)
+      setScore(newScore)
       if (currentQuestion === questions.length - 1) {
         setShowConfetti(true)
       }
@@ -74,8 +104,29 @@ export default function ObjectCountingGame() {
         setCurrentQuestion(currentQuestion + 1)
         setSelectedAnswer(null)
         setIsCorrect(null)
+        setQuestionStartTime(Date.now())
+        startTimer()
       } else {
+        setScore(newScore) // ensure final score is updated
+
         setGameState("result")
+
+        // Save results
+        const allTimes = [...answerTimes, timeTaken]
+        const averageTime = allTimes.reduce((sum, time) => sum + time, 0) / allTimes.length
+
+        // Log result
+        console.log({
+          gameName: "Object Counting Game",
+          score: newScore,
+          averageTime,
+        })
+
+        addScore('object-counting', {
+          score: newScore,
+          averageTime,
+          totalQuestions: questions.length,
+        })
       }
     }, 1500)
   }
@@ -87,6 +138,8 @@ export default function ObjectCountingGame() {
     setIsCorrect(null)
     setGameState("intro")
     setShowConfetti(false)
+    setAnswerTimes([])
+    stopTimer()
   }
 
   const containerVariants = {
@@ -106,6 +159,12 @@ export default function ObjectCountingGame() {
       opacity: 1,
     },
   }
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [])
 
   return (
     <CandylandBackground>
@@ -221,7 +280,15 @@ export default function ObjectCountingGame() {
                 </div>
               )}
             </div>
-
+            <div className="mt-4 mb-6">
+              <p className="text-xl text-pink-700 mb-2">Average time per question:</p>
+              <p className="text-3xl font-bold text-pink-700">
+                {(answerTimes.length > 0
+                  ? (answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length)
+                  : 0
+                ).toFixed(1)} seconds
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button

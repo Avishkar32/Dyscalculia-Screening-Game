@@ -172,48 +172,6 @@ export default function ClockReadingGame() {
     ctx.stroke()
   }
 
-  // const handleAnswer = (answer: string) => {
-  //   if (selectedAnswer !== null) return // Prevent multiple answers
-
-  //   // Stop timer and calculate time taken
-  //   stopTimer()
-  //   const timeTaken = (Date.now() - questionStartTime) / 1000
-  //   setAnswerTimes((prev) => [...prev, timeTaken])
-
-  //   setSelectedAnswer(answer)
-
-  //   const currentQ = isBonusQuestion ? questions[currentQuestion].bonusAnswer : questions[currentQuestion].correctAnswer
-
-  //   const correct = answer === currentQ
-  //   setIsCorrect(correct)
-
-  //   if (correct) {
-  //     setScore(score + 1)
-  //     if (!isBonusQuestion && currentQuestion === questions.length - 1) {
-  //       setShowConfetti(true)
-  //     }
-  //   }
-
-  //   // Move to next question or bonus question after delay
-  //   setTimeout(() => {
-  //     if (isBonusQuestion) {
-  //       if (currentQuestion < questions.length - 1) {
-  //         setCurrentQuestion(currentQuestion + 1)
-  //         setIsBonusQuestion(false)
-  //       } else {
-  //         setGameState("result")
-  //       }
-  //     } else {
-  //       // Show bonus question for this clock
-  //       setIsBonusQuestion(true)
-  //     }
-
-  //     setSelectedAnswer(null)
-  //     setIsCorrect(null)
-  //     setQuestionStartTime(Date.now())
-  //     startTimer()
-  //   }, 2000)
-  // }
   const handleAnswer = (answer: string) => {
     if (selectedAnswer !== null) return // Prevent multiple answers
   
@@ -249,6 +207,7 @@ export default function ClockReadingGame() {
          
           addScore("clock-reading", {
             score: score + (correct ? 1 : 0),
+            totalQuestions: questions.length * 2,
             //averageTime: (answerTimes.reduce((sum, time) => sum + time, 0) + timeTaken) / (answerTimes.length + 1),
           })
         }

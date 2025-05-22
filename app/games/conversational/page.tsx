@@ -36,6 +36,8 @@ export default function ConversationalMathGame() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const addScore = useScoreStore((state) => state.addScore)
+  // Store Q&A pairs with time and correctness
+  const [qaPairs, setQaPairs] = useState<{ question: string; userAnswer: string; timeTaken: number; isCorrect: boolean }[]>([])
 
   const scenarios = [
     {
@@ -180,6 +182,12 @@ export default function ConversationalMathGame() {
     // Add user message
     setMessages((prev) => [...prev, { text: userInput, sender: "user" }])
 
+    // Store Q&A pair with time and correctness
+    setQaPairs((prev) => [
+      ...prev,
+      { question: currentQuestion.question, userAnswer: userInput, timeTaken, isCorrect }
+    ])
+
     // Add AI response after a short delay
     setTimeout(() => {
       if (isCorrect) {
@@ -230,12 +238,14 @@ export default function ConversationalMathGame() {
               setShowConfetti(true)
             }
 
-           
-            addScore("conversation", // ✅ fixed score used here
+            // Log Q&A pairs at the end of the test, including time and correctness
+            console.log("Questions and user responses:", qaPairs)
 
+            addScore("conversation",
               {
                 score: score,
-                ...({ averageTime:  answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length }) // Only include if exists
+                totalQuestions: 6,
+                ...({ averageTime:  answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length })
               } )
           }
         } else {
@@ -296,6 +306,7 @@ export default function ConversationalMathGame() {
     setIsAnswered(false)
     setCurrentDifficulty("medium")
     setAnswerTimes([])
+    setQaPairs([]) // Reset Q&A pairs
     stopTimer()
   }
 

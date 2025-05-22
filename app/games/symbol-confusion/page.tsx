@@ -76,7 +76,7 @@ export default function SymbolConfusionGame() {
         setScore(newScore) // ✅ ensure score is set correctly even if last question is wrong
         setGameState("result")
         addScore("symbol-confusion",
-          {score:newScore} ) // ✅ fixed score used here
+          {score:newScore, totalQuestions: questions.length} ) // ✅ fixed score used here
         console.log("Score added to store:", newScore)
       }
     }, 1500)

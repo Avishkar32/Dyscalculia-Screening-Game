@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Howl } from "howler"
@@ -8,6 +8,7 @@ import GameLayout from "@/components/game-layout"
 import ObjectDisplay from "@/components/object-display"
 import Confetti from "@/components/confetti"
 import { motion } from "framer-motion"
+import useScoreStore from "@/app/store/scoreStore";
 
 export default function DotCountingGame() {
   const router = useRouter()
@@ -19,6 +20,9 @@ export default function DotCountingGame() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showConfetti, setShowConfetti] = useState(false)
   const [answerTimes, setAnswerTimes] = useState<number[]>([])
+  const [questionStartTime, setQuestionStartTime] = useState(0)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const addScore = useScoreStore((state) => state.addScore);
 
   
   // Sound effects
@@ -87,6 +91,7 @@ export default function DotCountingGame() {
 
   const startGame = () => {
     setGameState("playing")
+    setQuestionStartTime(Date.now())
     showObjectsForDuration()
   }
 
@@ -94,6 +99,7 @@ export default function DotCountingGame() {
     setShowObjects(true)
     setTimeout(() => {
       setShowObjects(false)
+      setQuestionStartTime(Date.now()) // Start timing after objects disappear
     }, 2000) // Show objects for 2 seconds
   }
 
@@ -115,8 +121,8 @@ export default function DotCountingGame() {
     }
 
     // Record answer time
-    const answerTime = new Date().getTime()
-    setAnswerTimes([...answerTimes, answerTime])
+    const timeTaken = (Date.now() - questionStartTime) / 1000
+    setAnswerTimes((prev) => [...prev, timeTaken])
 
     // Move to next question after delay
     setTimeout(() => {
@@ -127,6 +133,23 @@ export default function DotCountingGame() {
         showObjectsForDuration()
       } else {
         setGameState("result")
+
+        // Save results
+        const allTimes = [...answerTimes, timeTaken]
+        const averageTime = allTimes.reduce((sum, time) => sum + time, 0) / allTimes.length
+
+        // Log result
+        console.log({
+          gameName: "Dot Counting Game",
+          score: correct ? score + 1 : score,
+          averageTime,
+        })
+
+        addScore('dot-counting', {
+          score: correct ? score + 1 : score,
+          averageTime,
+          totalQuestions: questions.length,
+        })
       }
     }, 1500)
   }
@@ -273,7 +296,15 @@ export default function DotCountingGame() {
                 </div>
               )}
             </div>
-
+            <div className="mt-4 mb-6">
+              <p className="text-xl text-indigo-700 mb-2">Average time per question:</p>
+              <p className="text-3xl font-bold text-indigo-700">
+                {(answerTimes.length > 0
+                  ? (answerTimes.reduce((sum, time) => sum + time, 0) / answerTimes.length)
+                  : 0
+                ).toFixed(1)} seconds
+              </p>
+            </div>
             <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button

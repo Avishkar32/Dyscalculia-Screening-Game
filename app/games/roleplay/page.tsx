@@ -68,34 +68,6 @@ export default function MathRoleplayGame() {
     setGameState("playing")
   }
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   if (!userAnswer.trim() || isAnswered) return
-
-  //   const correct = userAnswer.trim() === scenarios[currentQuestion].correctAnswer
-  //   setIsCorrect(correct)
-  //   setIsAnswered(true)
-
-  //   if (correct) {
-  //     setScore(score + 1)
-  //     if (currentQuestion === scenarios.length - 1) {
-  //       setShowConfetti(true)
-  //     }
-  //   }
-
-  //   // Move to next question after delay
-  //   setTimeout(() => {
-  //     if (currentQuestion < scenarios.length - 1) {
-  //       setCurrentQuestion(currentQuestion + 1)
-  //       setUserAnswer("")
-  //       setIsCorrect(null)
-  //       setIsAnswered(false)
-  //     } else {
-  //       setGameState("result")
-  //     }
-  //   }, 2000)
-  // }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!userAnswer.trim() || isAnswered) return
@@ -131,6 +103,7 @@ export default function MathRoleplayGame() {
         })
         addScore('roleplay word problems', {
           score: newScore,
+          totalQuestions: scenarios.length,
         });
       }
     }, 2000)

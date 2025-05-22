@@ -61,38 +61,6 @@ export default function NumberComparisonGame() {
     setGameState("playing")
   }
 
-  // const handleAnswer = (side: "left" | "right" | "equal") => {
-  //   if (selectedSide !== null) return // Prevent multiple answers
-
-  //   setSelectedSide(side)
-  //   const correct = side === questions[currentQuestion].correctAnswer
-  //   setIsCorrect(correct)
-
-  //   if (correct) {
-  //     setScore(score + 1)
-  //     if (currentQuestion === questions.length - 1) {
-  //       setShowConfetti(true)
-  //     }
-  //   }
-
-  //   // Move to next question after delay
-  //   setTimeout(() => {
-  //     if (currentQuestion < questions.length - 1) {
-  //       setCurrentQuestion(currentQuestion + 1)
-  //       setSelectedSide(null)
-  //       setIsCorrect(null)
-  //     } else {
-  //       setGameState("result")
-
-  //       addScore("number-comparison", score ) 
-  //       console.log(score);
-
-  //       console.log(addScore);
-
-  //     }
-  //   }, 1200)
-  // }
-
   const handleAnswer = (side: "left" | "right" | "equal") => {
     if (selectedSide !== null) return // Prevent multiple answers
   
@@ -120,6 +88,7 @@ export default function NumberComparisonGame() {
 
         {
           score: newScore,
+          totalQuestions: questions.length,
           ...(timeData !== undefined && { averageTime: timeData }) // Only include if exists
         } )
 

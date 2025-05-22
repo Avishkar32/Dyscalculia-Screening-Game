@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "set PORT=9000 && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -44,6 +44,7 @@
     "cmdk": "1.0.4",
     "date-fns": "4.1.0",
     "embla-carousel-react": "8.5.1",
+    "express": "^5.1.0",
     "framer-motion": "latest",
     "howler": "latest",
     "input-otp": "1.4.1",
@@ -71,5 +72,21 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Avishkar32/Dyscalculia-Screening-Game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Avishkar32/Dyscalculia-Screening-Game/issues"
+  },
+  "homepage": "https://github.com/Avishkar32/Dyscalculia-Screening-Game#readme",
+  "description": ""
 }
