@@ -15,7 +15,7 @@ app.use(express.json());
 
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: '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',
+  apiKey: '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',
   defaultHeaders: {
     'HTTP-Referer': 'https://your-site-url.com',
     'X-Title': process.env.YOUR_SITE_NAME,
