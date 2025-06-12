@@ -42,7 +42,7 @@ const ResultsPage: React.FC = () => {
         total: data?.totalQuestions ?? 10,
       }));
 
-      const res = await fetch("http://localhost:5002/askmath", {
+      const res = await fetch("https://dyscalculia-screening-game-gemini.onrender.com/askmath", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ age, scores: scoresArr }),
