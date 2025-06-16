@@ -14,6 +14,10 @@ const ResultsPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [pendingDiagnosis, setPendingDiagnosis] = useState(false);
+
   const totalScore = Object.values(scores).reduce((sum, entry) => {
     return sum + (entry?.score ?? 0);
   }, 0);
@@ -59,11 +63,46 @@ const ResultsPage: React.FC = () => {
     }
   };
 
+  // Handler for button click to show modal first
+  const handleDiagnosisClick = () => {
+    setShowModal(true);
+    setPendingDiagnosis(true);
+  };
+
+  // Handler for closing modal and proceeding
+  const handleModalClose = () => {
+    setShowModal(false);
+    if (pendingDiagnosis) {
+      setPendingDiagnosis(false);
+      handleDiagnosis();
+    }
+  };
+
   return (
     <>
       <Head>
         <title>Assessment Results</title>
       </Head>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+            <h3 className="text-lg font-bold mb-4 text-indigo-700">Please Note</h3>
+            <p className="mb-6 text-gray-700">
+              Please note that our website backend is hosted on a free tier server (Render). Due to this, the server may go into sleep mode after a period of inactivity. When a new request is made, the server takes some time to restart, which may result in a noticeable delay in receiving your result.<br /><br />
+              We appreciate your patience and understanding!
+            </p>
+            <button
+              className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition"
+              onClick={handleModalClose}
+              autoFocus
+            >
+              OK, Continue
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="container mx-auto p-6 max-w-3xl">
         <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-700">🧠 Assessment Results</h1>
@@ -86,14 +125,14 @@ const ResultsPage: React.FC = () => {
         <div className="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl shadow p-6 mb-6 text-center">
           <h2 className="text-xl font-semibold text-indigo-900 mb-2">⭐ Total Score</h2>
           <p className="text-5xl font-extrabold text-indigo-700">
-            {totalScore}/{Object.keys(scores).length * 100}
+            {totalScore}/{Object.keys(scores).length * 5}
           </p>
         </div>
 
         {Object.keys(scores).length >= 2 && (
           <>
             <button
-              onClick={handleDiagnosis}
+              onClick={handleDiagnosisClick}
               className={`mb-4 px-6 py-3 rounded-xl w-full text-white font-semibold shadow transition-all duration-200 ${
                 loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
               }`}
